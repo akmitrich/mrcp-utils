@@ -2,6 +2,11 @@
 name = "mrcp-utils"
 version = "1.0.0"
 edition = "2021"
+license-file = "LICENSE"
+description = "Some utilities for integration of ASR and TTS services into UniMRCP server"
+homepage = "https://optimalcity.ru/"
+repository = "https://github.com/akmitrich/mrcp-utils"
+keywords = ["mrcp", "unimrcp"]
 
 [dependencies]
 libc = "0.2.158"

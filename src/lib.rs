@@ -15,6 +15,7 @@
 #![allow(clippy::missing_safety_doc)]
 pub mod uni;
 pub use uni::*;
+pub mod headers;
 
 pub unsafe fn inline_mrcp_engine_open_respond(
     engine: *mut uni::mrcp_engine_t,
