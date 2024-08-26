@@ -42,8 +42,7 @@ fn extract_vendor_specific_parameters(
                     let pair = pairs.offset(offset as _) as *mut uni::apt_str_t;
                     let key = &*pair.offset(0);
                     let value = &*pair.offset(1);
-                    if let (Some(key), Some(value)) =
-                        (apt_str_to_string(key), apt_str_to_string(value))
+                    if let (Ok(key), Ok(value)) = (apt_str_to_string(key), apt_str_to_string(value))
                     {
                         params.insert(key, value);
                     };
@@ -54,15 +53,15 @@ fn extract_vendor_specific_parameters(
     params
 }
 
-fn apt_str_to_string(origin: &uni::apt_str_t) -> Option<String> {
+fn apt_str_to_string(origin: &uni::apt_str_t) -> crate::Result<String> {
     unsafe {
         let ptr = origin.buf as *const u8;
         let len = origin.length;
         if len == 0 || ptr.is_null() {
-            None
+            Ok(String::new())
         } else {
             let as_slice = std::slice::from_raw_parts(ptr, len);
-            std::str::from_utf8(as_slice).ok().map(|s| s.to_owned())
+            Ok(std::str::from_utf8(as_slice).map(ToOwned::to_owned)?)
         }
     }
 }

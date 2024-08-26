@@ -9,6 +9,7 @@ repository = "https://github.com/akmitrich/mrcp-utils"
 keywords = ["mrcp", "unimrcp"]
 
 [dependencies]
+derive_more = { version = "1.0.0", features = ["from"] }
 libc = "0.2.158"
 
 [build-dependencies]

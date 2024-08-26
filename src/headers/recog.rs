@@ -17,11 +17,11 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct RecogHeaders {
-    sensitivity: Option<f64>,
-    noinput_timeout: Option<usize>,
-    recognition_timeout: Option<usize>,
-    start_input_timers: Option<bool>,
-    silence_timeout: Option<usize>,
+    pub sensitivity: crate::Result<f64>,
+    pub noinput_timeout: crate::Result<usize>,
+    pub recognition_timeout: crate::Result<usize>,
+    pub start_input_timers: crate::Result<bool>,
+    pub silence_timeout: crate::Result<usize>,
     pub vendor_specific: HashMap<String, String>,
 }
 
@@ -38,29 +38,29 @@ impl RecogHeaders {
     }
 
     pub fn sensitivity(&self) -> f64 {
-        self.sensitivity.unwrap_or(0.6)
+        *self.sensitivity.as_ref().unwrap_or(&0.6)
     }
 
     pub fn noinput_timeout(&self) -> usize {
-        self.noinput_timeout.unwrap_or(5000)
+        *self.noinput_timeout.as_ref().unwrap_or(&5000)
     }
 
     pub fn recognition_timeout(&self) -> usize {
-        self.recognition_timeout.unwrap_or(20000)
+        *self.recognition_timeout.as_ref().unwrap_or(&20000)
     }
 
     pub fn start_input_timers(&self) -> bool {
-        self.start_input_timers.unwrap_or(true)
+        *self.start_input_timers.as_ref().unwrap_or(&true)
     }
 
     pub fn silence_timeout(&self) -> usize {
-        self.silence_timeout.unwrap_or(1000)
+        *self.silence_timeout.as_ref().unwrap_or(&1000)
     }
 }
 
-fn extract_sensitivity(request: *const uni::mrcp_message_t) -> Option<f64> {
+fn extract_sensitivity(request: *const uni::mrcp_message_t) -> crate::Result<f64> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -71,19 +71,23 @@ fn extract_sensitivity(request: *const uni::mrcp_message_t) -> Option<f64> {
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::RECOGNIZER_HEADER_SENSITIVITY_LEVEL,
+                ))
             } else {
-                Some((*recog_header).sensitivity_level as _)
+                Ok((*recog_header).sensitivity_level as _)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::RECOGNIZER_HEADER_SENSITIVITY_LEVEL,
+            ))
         }
     }
 }
 
-fn extract_noinput_timeout(request: *const uni::mrcp_message_t) -> Option<usize> {
+fn extract_noinput_timeout(request: *const uni::mrcp_message_t) -> crate::Result<usize> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -94,19 +98,23 @@ fn extract_noinput_timeout(request: *const uni::mrcp_message_t) -> Option<usize>
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::RECOGNIZER_HEADER_NO_INPUT_TIMEOUT,
+                ))
             } else {
-                Some((*recog_header).no_input_timeout)
+                Ok((*recog_header).no_input_timeout)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::RECOGNIZER_HEADER_NO_INPUT_TIMEOUT,
+            ))
         }
     }
 }
 
-fn extract_recognition_timeout(request: *const uni::mrcp_message_t) -> Option<usize> {
+fn extract_recognition_timeout(request: *const uni::mrcp_message_t) -> crate::Result<usize> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -117,19 +125,23 @@ fn extract_recognition_timeout(request: *const uni::mrcp_message_t) -> Option<us
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::RECOGNIZER_HEADER_RECOGNITION_TIMEOUT,
+                ))
             } else {
-                Some((*recog_header).recognition_timeout)
+                Ok((*recog_header).recognition_timeout)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::RECOGNIZER_HEADER_RECOGNITION_TIMEOUT,
+            ))
         }
     }
 }
 
-fn extract_start_input_timers(request: *const uni::mrcp_message_t) -> Option<bool> {
+fn extract_start_input_timers(request: *const uni::mrcp_message_t) -> crate::Result<bool> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -140,19 +152,23 @@ fn extract_start_input_timers(request: *const uni::mrcp_message_t) -> Option<boo
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::RECOGNIZER_HEADER_START_INPUT_TIMERS,
+                ))
             } else {
-                Some((*recog_header).start_input_timers == uni::TRUE)
+                Ok((*recog_header).start_input_timers == uni::TRUE)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::RECOGNIZER_HEADER_START_INPUT_TIMERS,
+            ))
         }
     }
 }
 
-fn extract_speech_complete_timeout(request: *const uni::mrcp_message_t) -> Option<usize> {
+fn extract_speech_complete_timeout(request: *const uni::mrcp_message_t) -> crate::Result<usize> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -163,17 +179,21 @@ fn extract_speech_complete_timeout(request: *const uni::mrcp_message_t) -> Optio
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::RECOGNIZER_HEADER_SPEECH_COMPLETE_TIMEOUT,
+                ))
             } else {
                 match (*recog_header).speech_complete_timeout {
-                    0..=1 => Some(1000),
-                    timeout @ 2..=4 => Some(timeout * 1000),
-                    5..=20 => Some(1200),
-                    value => Some(value),
+                    0..=1 => Ok(1000),
+                    timeout @ 2..=4 => Ok(timeout * 1000),
+                    5..=20 => Ok(1200),
+                    value => Ok(value),
                 }
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::RECOGNIZER_HEADER_SPEECH_COMPLETE_TIMEOUT,
+            ))
         }
     }
 }

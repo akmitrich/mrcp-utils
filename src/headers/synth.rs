@@ -21,9 +21,9 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct SynthHeaders {
-    content_length: Option<usize>,
-    voice_name: Option<String>,
-    body: Option<String>,
+    pub content_length: crate::Result<usize>,
+    pub voice_name: crate::Result<String>,
+    pub body: crate::Result<String>,
     pub vendor_specific: HashMap<String, String>,
 }
 
@@ -38,24 +38,24 @@ impl SynthHeaders {
     }
 
     pub fn content_length(&self) -> usize {
-        self.content_length.unwrap_or_default()
+        *self.content_length.as_ref().unwrap_or(&0)
     }
 
     pub fn voice_name(&self) -> &str {
         match &self.voice_name {
-            Some(voice) => voice.as_str(),
-            None => "",
+            Ok(voice) => voice.as_str(),
+            _ => "",
         }
     }
 
     pub fn body(&self) -> Option<&str> {
-        self.body.as_deref()
+        self.body.as_deref().ok()
     }
 }
 
-fn extract_content_length(request: *const uni::mrcp_message_t) -> Option<usize> {
+fn extract_content_length(request: *const uni::mrcp_message_t) -> crate::Result<usize> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_generic_header_property_check(
@@ -65,19 +65,23 @@ fn extract_content_length(request: *const uni::mrcp_message_t) -> Option<usize> 
         {
             let generic_header = inline_mrcp_generic_header_get(request);
             if generic_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::GENERIC_HEADER_CONTENT_LENGTH,
+                ))
             } else {
-                Some((*generic_header).content_length)
+                Ok((*generic_header).content_length)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::GENERIC_HEADER_CONTENT_LENGTH,
+            ))
         }
     }
 }
 
-fn extract_voice_name(request: *const uni::mrcp_message_t) -> Option<String> {
+fn extract_voice_name(request: *const uni::mrcp_message_t) -> crate::Result<String> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe {
         if inline_mrcp_resource_header_property_check(
@@ -88,19 +92,23 @@ fn extract_voice_name(request: *const uni::mrcp_message_t) -> Option<String> {
             let synth_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_synth_header_t;
             if synth_header.is_null() {
-                None
+                Err(crate::Error::NoSuchResourceHeader(
+                    uni::SYNTHESIZER_HEADER_VOICE_NAME,
+                ))
             } else {
                 apt_str_to_string(&(*synth_header).voice_param.name)
             }
         } else {
-            None
+            Err(crate::Error::NoSuchResourceHeader(
+                uni::SYNTHESIZER_HEADER_VOICE_NAME,
+            ))
         }
     }
 }
 
-fn extract_body(request: *const uni::mrcp_message_t) -> Option<String> {
+fn extract_body(request: *const uni::mrcp_message_t) -> crate::Result<String> {
     if request.is_null() {
-        return None;
+        return Err(crate::Error::NullRequest);
     }
     unsafe { apt_str_to_string(&(*request).body) }
 }

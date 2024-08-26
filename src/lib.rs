@@ -13,10 +13,13 @@
 //    limitations under the License.
 
 #![allow(clippy::missing_safety_doc)]
-pub mod uni;
-pub use uni::*;
 pub mod engine;
+mod error;
 pub mod headers;
+pub mod uni;
+
+pub use error::{Error, Result};
+pub use uni::*;
 
 pub unsafe fn inline_mrcp_engine_open_respond(
     engine: *mut uni::mrcp_engine_t,

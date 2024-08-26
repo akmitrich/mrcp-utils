@@ -56,20 +56,17 @@ impl<E: Shutdown> SafeEngine<E> {
     }
 }
 
-pub fn get_attribute(engine: *const uni::mrcp_engine_t, key: &[u8]) -> Option<String> {
+pub fn get_param(engine: *const uni::mrcp_engine_t, key: &[u8]) -> crate::Result<String> {
     unsafe {
-        let name = key.as_ptr() as *const i8;
+        let name = key.as_ptr() as *mut i8;
         let raw_value = uni::mrcp_engine_param_get(engine, name);
         if raw_value.is_null() {
-            // log::error!("[TCS_ENGINE] Your TCS Engine have no parameter '{:?}'. Consider edit 'unimrcpserver.xml' conf file.", key);
-            return None;
+            return Err(crate::Error::NoSuchEngineParam(
+                std::ffi::CString::from_raw(name),
+            ));
         }
-        std::ffi::CStr::from_ptr(raw_value)
+        Ok(std::ffi::CStr::from_ptr(raw_value)
             .to_str()
-            .inspect_err(|e| {
-                // log::error!("Your secret key is non-UTF8. {:?}", e);
-            })
-            .map(ToOwned::to_owned)
-            .ok()
+            .map(ToOwned::to_owned)?)
     }
 }
