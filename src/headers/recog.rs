@@ -71,14 +71,14 @@ fn extract_sensitivity(request: *const uni::mrcp_message_t) -> crate::Result<f64
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::RECOGNIZER_HEADER_SENSITIVITY_LEVEL,
                 ))
             } else {
                 Ok((*recog_header).sensitivity_level as _)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::RECOGNIZER_HEADER_SENSITIVITY_LEVEL,
             ))
         }
@@ -98,14 +98,14 @@ fn extract_noinput_timeout(request: *const uni::mrcp_message_t) -> crate::Result
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::RECOGNIZER_HEADER_NO_INPUT_TIMEOUT,
                 ))
             } else {
                 Ok((*recog_header).no_input_timeout)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::RECOGNIZER_HEADER_NO_INPUT_TIMEOUT,
             ))
         }
@@ -125,14 +125,14 @@ fn extract_recognition_timeout(request: *const uni::mrcp_message_t) -> crate::Re
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::RECOGNIZER_HEADER_RECOGNITION_TIMEOUT,
                 ))
             } else {
                 Ok((*recog_header).recognition_timeout)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::RECOGNIZER_HEADER_RECOGNITION_TIMEOUT,
             ))
         }
@@ -152,14 +152,14 @@ fn extract_start_input_timers(request: *const uni::mrcp_message_t) -> crate::Res
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::RECOGNIZER_HEADER_START_INPUT_TIMERS,
                 ))
             } else {
                 Ok((*recog_header).start_input_timers == uni::TRUE)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::RECOGNIZER_HEADER_START_INPUT_TIMERS,
             ))
         }
@@ -179,7 +179,7 @@ fn extract_speech_complete_timeout(request: *const uni::mrcp_message_t) -> crate
             let recog_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_recog_header_t;
             if recog_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::RECOGNIZER_HEADER_SPEECH_COMPLETE_TIMEOUT,
                 ))
             } else {
@@ -191,7 +191,7 @@ fn extract_speech_complete_timeout(request: *const uni::mrcp_message_t) -> crate
                 }
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::RECOGNIZER_HEADER_SPEECH_COMPLETE_TIMEOUT,
             ))
         }

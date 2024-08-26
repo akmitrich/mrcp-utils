@@ -65,14 +65,14 @@ fn extract_content_length(request: *const uni::mrcp_message_t) -> crate::Result<
         {
             let generic_header = inline_mrcp_generic_header_get(request);
             if generic_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::GENERIC_HEADER_CONTENT_LENGTH,
                 ))
             } else {
                 Ok((*generic_header).content_length)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::GENERIC_HEADER_CONTENT_LENGTH,
             ))
         }
@@ -92,14 +92,14 @@ fn extract_voice_name(request: *const uni::mrcp_message_t) -> crate::Result<Stri
             let synth_header =
                 inline_mrcp_resource_header_get(request) as *mut uni::mrcp_synth_header_t;
             if synth_header.is_null() {
-                Err(crate::Error::NoSuchResourceHeader(
+                Err(crate::Error::NoSuchHeader(
                     uni::SYNTHESIZER_HEADER_VOICE_NAME,
                 ))
             } else {
                 apt_str_to_string(&(*synth_header).voice_param.name)
             }
         } else {
-            Err(crate::Error::NoSuchResourceHeader(
+            Err(crate::Error::NoSuchHeader(
                 uni::SYNTHESIZER_HEADER_VOICE_NAME,
             ))
         }

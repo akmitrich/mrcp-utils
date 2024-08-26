@@ -12,7 +12,7 @@ pub enum Error {
 
     // -- Internals
     NoSuchEngineParam(std::ffi::CString),
-    NoSuchResourceHeader(u32),
+    NoSuchHeader(u32),
     NullRequest,
 }
 
