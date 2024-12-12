@@ -22,6 +22,7 @@ fn main() {
 
     println!("cargo:rustc-link-lib=apr-1");
     println!("cargo:rustc-link-lib=unimrcpserver");
+    println!("cargo:rustc-link-lib=unimrcpclient");
     println!("cargo:rustc-link-search={}/lib", unimrcp_path);
     println!("cargo:rustc-link-search={}/lib", apr_lib_path);
 
